@@ -28,8 +28,36 @@ type KubeFilerPortalSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of KubeFilerPortal. Edit kubefilerportal_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Hostname or IP address of the Portal
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength:=1
+	Address string `json:"foo,omitempty"`
+
+	// Credentials for the Portal
+	// +kubebuilder:validation:Required
+	Credentials *KubeFilerPortalCredentialsSpec `json:"credentials,omitempty"`
+
+	// Always trust the credentials provided by the Portal
+	// +kubebuilder:default:=false
+	// +optional
+	Trust bool `json:"trust,omitempty"`
+}
+
+type KubeFilerPortalCredentialsSpec struct {
+	// Secret identifies the name of the secret storing username and password keys
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength:=1
+	Secret string `json:"secret,omitempty"`
+
+	// UsernameKey identifies the key within the secret that stores the Username
+	// +kubebuilder:default:=username
+	// +optional
+	UsernameKey string `json:"username_key,omitempty"`
+
+	// PasswordKey identifies the key within the secret that stores the Password
+	// +kubebuilder:default:=password
+	// +optional
+	PasswordKey string `json:"password_key,omitempty"`
 }
 
 // KubeFilerPortalStatus defines the observed state of KubeFilerPortal

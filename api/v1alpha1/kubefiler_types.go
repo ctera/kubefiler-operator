@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,8 +29,33 @@ type KubeFilerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of KubeFiler. Edit kubefiler_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Portal configuration
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength:=1
+	Portal string `json:"portal,omitempty"`
+
+	// Storage defines the type and location of the storage that backs this
+	// share.
+	Storage KubeFilerStorageSpec `json:"storage"`
+}
+
+// KubeFilerStorageSpec defines how storage is associated with the KubeFiler.
+type KubeFilerStorageSpec struct {
+	// Pvc defines PVC backed storage for this share.
+	// +optional
+	Pvc *KubeFilerPvcSpec `json:"pvc,omitempty"`
+}
+
+// KubeFilerPvcSpec defines how a PVC may be associated with the KubeFiler.
+type KubeFilerPvcSpec struct {
+	// Name of the PVC to use for the share.
+	// +optional
+	Name string `json:"name,omitempty"`
+
+	// Spec defines a new, temporary, PVC to use for the share.
+	// Behaves similar to the embedded PVC spec for pods.
+	// +optional
+	Spec *corev1.PersistentVolumeClaimSpec `json:"spec,omitempty"`
 }
 
 // KubeFilerStatus defines the observed state of KubeFiler
