@@ -1,0 +1,24 @@
+# permissions for end users to edit kubefilerportals.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubefilerportal-editor-role
+rules:
+- apiGroups:
+  - kubefiler.ctera.com
+  resources:
+  - kubefilerportals
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubefiler.ctera.com
+  resources:
+  - kubefilerportals/status
+  verbs:
+  - get

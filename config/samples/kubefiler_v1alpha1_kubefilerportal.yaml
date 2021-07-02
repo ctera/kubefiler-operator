@@ -1,0 +1,7 @@
+apiVersion: kubefiler.ctera.com/v1alpha1
+kind: KubeFilerPortal
+metadata:
+  name: kubefilerportal-sample
+spec:
+  # Add fields here
+  foo: bar
