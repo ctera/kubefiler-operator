@@ -1,5 +1,5 @@
 /*
-Copyright 2021.
+Copyright 2021, CTERA Networks
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -30,7 +29,6 @@ import (
 // KubeFilerPortalReconciler reconciles a KubeFilerPortal object
 type KubeFilerPortalReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
 }
 
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilerportals,verbs=get;list;watch;create;update;patch;delete

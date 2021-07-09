@@ -1,5 +1,5 @@
 /*
-Copyright 2021.
+Copyright 2021, CTERA Networks
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,18 +19,22 @@ package controllers
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
+	"github.com/ctera/ctera-gateway-operator/internal/resources"
 )
 
 // KubeFilerReconciler reconciles a KubeFiler object
 type KubeFilerReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Log      logr.Logger
+	recorder record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilers,verbs=get;list;watch;create;update;patch;delete
@@ -47,16 +51,32 @@ type KubeFilerReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *KubeFilerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	reqLogger := r.Log.WithValues("kubefiler", req.NamespacedName)
+	reqLogger.Info("Reconciling KubeFiler")
 
-	// your logic here
+	kubeFilerManager := resources.NewKubeFilerManager(r, r.recorder, reqLogger)
+	res := kubeFilerManager.Process(ctx, req.NamespacedName)
+	err := res.Err()
+	if res.Requeue() {
+		return ctrl.Result{Requeue: true}, err
+	}
+	return ctrl.Result{}, err
+}
 
-	return ctrl.Result{}, nil
+func (r *KubeFilerReconciler) setRecorder(mgr ctrl.Manager) {
+	if r.recorder == nil {
+		r.recorder = mgr.GetEventRecorderFor("kubefiler-controller")
+	}
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *KubeFilerReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	r.setRecorder(mgr)
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&kubefilerv1alpha1.KubeFiler{}).
+		Owns(&corev1.PersistentVolumeClaim{}).
+		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
+		Owns(&corev1.Secret{}).
 		Complete(r)
 }
