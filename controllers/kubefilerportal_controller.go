@@ -35,8 +35,8 @@ type KubeFilerPortalReconciler struct {
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilerportals/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilerportals/finalizers,verbs=update
 
-// The KubeFilerPortal resource is only configuration. Currently, updating it does not have any effect
-func (r *KubeFilerPortalReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+// Reconcile The KubeFilerPortal resource is only configuration. Currently, updating it does not have any effect
+func (*KubeFilerPortalReconciler) Reconcile(ctx context.Context, _ ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
 	// your logic here

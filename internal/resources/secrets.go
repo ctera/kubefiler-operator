@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	// UsernameKey is the name of the key to read the username from when reading the secret
+	// GatewayUsernameKey is the name of the key to read the username from when reading the secret
 	GatewayUsernameKey = "username"
 	// GatewayDefaultUsername is the username for the secret
 	GatewayDefaultUsername = "admin"

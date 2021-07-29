@@ -198,3 +198,39 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+.PHONY: check check-revive check-format
+
+check: check-revive check-format vet
+
+check-format:
+	! gofmt $(CHECK_GOFMT_FLAGS) . | sed 's,^,formatting error: ,' | grep 'go$$'
+
+check-revive: revive
+	# revive's checks are configured using .revive.toml
+	# See: https://github.com/mgechev/revive
+	$(REVIVE) -config .revive.toml $$(go list ./... | grep -v /vendor/)
+
+.PHONY: revive
+revive:
+ifeq (, $(shell command -v revive ;))
+	@echo "revive not found in PATH, checking in GOBIN ($(GOBIN))..."
+ifeq (, $(shell command -v $(GOBIN)/revive ;))
+	@{ \
+	set -e ;\
+	echo "revive not found in GOBIN, getting revive..." ;\
+	REVIVE_TMP_DIR=$$(mktemp -d) ;\
+	cd $$REVIVE_TMP_DIR ;\
+	go mod init tmp ;\
+	go get  github.com/mgechev/revive  ;\
+	rm -rf $$REVIVE_TMP_DIR ;\
+	}
+	@echo "revive installed in GOBIN"
+else
+	@echo "revive found in GOBIN"
+endif
+REVIVE=$(shell command -v $(GOBIN)/revive ;)
+else
+	@echo "revive found in PATH"
+REVIVE=$(shell command -v revive ;)
+endif

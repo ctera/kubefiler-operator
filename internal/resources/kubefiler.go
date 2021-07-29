@@ -122,7 +122,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		instance.Spec.Storage.Pvc.Name = pvc.Name
 	}
 
-	portalConfigMap, created, err := getOrCreateGatewayPortalConfigMap(ctx, m.client, instance, kubeFilerPortal, destNamespace)
+	_, created, err = getOrCreateGatewayPortalConfigMap(ctx, m.client, instance, kubeFilerPortal, destNamespace)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
@@ -130,7 +130,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		return Requeue
 	}
 
-	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal, portalConfigMap, destNamespace)
+	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal, destNamespace)
 	if err != nil {
 		return Result{err: err}
 	} else if created {

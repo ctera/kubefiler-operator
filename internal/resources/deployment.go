@@ -47,7 +47,7 @@ func getDeployment(ctx context.Context, client client.Client, ns, name string) (
 	return deployment, err
 }
 
-func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, portalConfigMap *corev1.ConfigMap, ns string) (*appsv1.Deployment, bool, error) {
+func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, ns string) (*appsv1.Deployment, bool, error) {
 	deploymentName := getGatewayDeploymentName(instance)
 
 	// fetch the existing secret, if available

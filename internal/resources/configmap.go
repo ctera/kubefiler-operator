@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	// UsernameKey is the name of the key to read the username from when reading the secret
+	// GatewayPortalAddressKey is the name of the key to read the username from when reading the secret
 	GatewayPortalAddressKey = "address"
 )
 

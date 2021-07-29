@@ -43,6 +43,7 @@ type KubeFilerPortalSpec struct {
 	Trust bool `json:"trust,omitempty"`
 }
 
+// KubeFilerPortalCredentialsSpec defines the secret used to access the Portal
 type KubeFilerPortalCredentialsSpec struct {
 	// Secret identifies the name of the secret storing username and password keys
 	// +kubebuilder:validation:Required
