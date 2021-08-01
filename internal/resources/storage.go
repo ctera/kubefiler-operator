@@ -76,7 +76,7 @@ func getGatewayPvcName(instance *kubefilerv1alpha1.KubeFiler) string {
 	if instance.Spec.Storage.Pvc.Name != "" {
 		return instance.Spec.Storage.Pvc.Name
 	}
-	return instance.GetName() + "-pvc"
+	return instance.GetName() + "-kubefiler-pvc"
 }
 
 func generateGatewayPvc(client client.Client, instance *kubefilerv1alpha1.KubeFiler, name string) (*corev1.PersistentVolumeClaim, error) {

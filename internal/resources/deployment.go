@@ -59,11 +59,11 @@ func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg
 	if errors.IsNotFound(err) {
 		deployment, err = generateGatewayDeployment(deploymentName, cfg, instance, gatewaySecret.Name, kubeFilerPortal, client.Scheme())
 		if err != nil {
-			return deployment, false, err
+			return nil, false, err
 		}
 		err = client.Create(ctx, deployment)
 		if err != nil {
-			return deployment, false, err
+			return nil, false, err
 		}
 		// Deployment created successfully
 		return deployment, true, nil

@@ -89,7 +89,7 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 REPORTS_DIR=reports
 COVERAGE_REPORT_FILE=${REPORTS_DIR}/coverage.cov
 COVERAGE_HTML_FILE=${REPORTS_DIR}/coverage.html
-MINIMAL_COVERAGE_RATE=5
+MINIMAL_COVERAGE_RATE=50
 test: manifests generate fmt vet ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	mkdir -p ${REPORTS_DIR}
