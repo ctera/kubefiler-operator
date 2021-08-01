@@ -25,8 +25,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
-	"github.com/ctera/ctera-gateway-operator/internal/conf"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
+	"github.com/ctera/kubefiler-operator/internal/conf"
 )
 
 const kubeFilerFinalizer = "kubefiler-operator.ctera.com/kubeFilerFinalizer"

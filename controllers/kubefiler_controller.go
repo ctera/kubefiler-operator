@@ -26,8 +26,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
-	"github.com/ctera/ctera-gateway-operator/internal/resources"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
+	"github.com/ctera/kubefiler-operator/internal/resources"
 )
 
 // KubeFilerReconciler reconciles a KubeFiler object

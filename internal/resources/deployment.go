@@ -20,7 +20,7 @@ import (
 	"context"
 	"strings"
 
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -30,7 +30,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"github.com/ctera/ctera-gateway-operator/internal/conf"
+	"github.com/ctera/kubefiler-operator/internal/conf"
 )
 
 func getDeployment(ctx context.Context, client client.Client, ns, name string) (*appsv1.Deployment, error) {

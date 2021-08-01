@@ -23,7 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 )
 
 // KubeFilerPortalReconciler reconciles a KubeFilerPortal object

@@ -4,8 +4,8 @@ layout:
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
-projectName: ctera-gateway-operator
-repo: github.com/ctera/ctera-gateway-operator
+projectName: kubefiler-operator
+repo: github.com/ctera/kubefiler-operator
 resources:
 - api:
     crdVersion: v1
@@ -14,7 +14,7 @@ resources:
   domain: ctera.com
   group: kubefiler
   kind: KubeFiler
-  path: github.com/ctera/ctera-gateway-operator/api/v1alpha1
+  path: github.com/ctera/kubefiler-operator/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -23,6 +23,6 @@ resources:
   domain: ctera.com
   group: kubefiler
   kind: KubeFilerPortal
-  path: github.com/ctera/ctera-gateway-operator/api/v1alpha1
+  path: github.com/ctera/kubefiler-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

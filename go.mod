@@ -1,4 +1,4 @@
-module github.com/ctera/ctera-gateway-operator
+module github.com/ctera/kubefiler-operator
 
 go 1.16
 

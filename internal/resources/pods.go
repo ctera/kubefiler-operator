@@ -17,11 +17,11 @@ limitations under the License.
 package resources
 
 import (
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"github.com/ctera/ctera-gateway-operator/internal/conf"
+	"github.com/ctera/kubefiler-operator/internal/conf"
 )
 
 const (

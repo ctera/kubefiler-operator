@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	kubefilerv1alpha1 "github.com/ctera/ctera-gateway-operator/api/v1alpha1"
-	"github.com/ctera/ctera-gateway-operator/controllers"
+	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
+	"github.com/ctera/kubefiler-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
