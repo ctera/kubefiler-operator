@@ -86,10 +86,20 @@ vet: ## Run go vet against code.
 	go vet ./...
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+REPORTS_DIR=reports
+COVERAGE_REPORT_FILE=${REPORTS_DIR}/coverage.cov
+COVERAGE_HTML_FILE=${REPORTS_DIR}/coverage.html
+MINIMAL_COVERAGE_RATE=5
 test: manifests generate fmt vet ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
+	mkdir -p ${REPORTS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile ${COVERAGE_REPORT_FILE}
+
+coverage: test
+	go tool cover -func=${COVERAGE_REPORT_FILE}
+	go tool cover -html=${COVERAGE_REPORT_FILE} -o ${COVERAGE_HTML_FILE}
+	hack/verify-coverage.sh ${COVERAGE_REPORT_FILE} ${MINIMAL_COVERAGE_RATE}
 
 ##@ Build
 
