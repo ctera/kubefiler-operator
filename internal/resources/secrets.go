@@ -18,7 +18,6 @@ package resources
 
 import (
 	"context"
-	"strings"
 
 	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -65,17 +64,17 @@ func getSecret(ctx context.Context, client client.Client, ns, name string) (*cor
 	return secret, err
 }
 
-func getOrCreateGatewaySecret(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns string) (*corev1.Secret, bool, error) {
-	secretName := getGatewaySecretName(instance)
+func getOrCreateGatewaySecret(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler) (*corev1.Secret, bool, error) {
+	secretName := instance.GetName() + "-kubefiler-credentials"
 
 	// fetch the existing secret, if available
-	secret, err := getSecret(ctx, client, ns, secretName)
+	secret, err := getSecret(ctx, client, instance.GetNamespace(), secretName)
 	if err == nil {
 		return secret, false, nil
 	}
 
 	if errors.IsNotFound(err) {
-		secret, err = generateGatewaySecret(client, instance, ns, secretName)
+		secret, err = generateGatewaySecret(client, instance, secretName)
 		if err != nil {
 			return secret, false, err
 		}
@@ -91,17 +90,7 @@ func getOrCreateGatewaySecret(ctx context.Context, client client.Client, instanc
 	return nil, false, err
 }
 
-func getGatewaySecretName(instance *kubefilerv1alpha1.KubeFiler) string {
-	return strings.Join(
-		[]string{
-			instance.GetNamespace(),
-			instance.GetName(),
-		},
-		"-",
-	)
-}
-
-func generateGatewaySecret(client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns, name string) (*corev1.Secret, error) {
+func generateGatewaySecret(client client.Client, instance *kubefilerv1alpha1.KubeFiler, name string) (*corev1.Secret, error) {
 	pass, err := password.Generate(
 		GatewayPasswordLength,
 		GatewayPasswordNumDigits,
@@ -117,7 +106,7 @@ func generateGatewaySecret(client client.Client, instance *kubefilerv1alpha1.Kub
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: ns,
+			Namespace: instance.GetNamespace(),
 		},
 		Immutable: &immutable,
 		StringData: map[string]string{

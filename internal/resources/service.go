@@ -18,7 +18,6 @@ package resources
 
 import (
 	"context"
-	"strings"
 
 	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -43,17 +42,17 @@ func getService(ctx context.Context, client client.Client, ns, name string) (*co
 	return service, err
 }
 
-func getOrCreateGatewayService(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns string) (*corev1.Service, bool, error) {
+func getOrCreateGatewayService(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler) (*corev1.Service, bool, error) {
 	serviceName := getGatewayServiceName(instance)
 
 	// fetch the existing secret, if available
-	service, err := getService(ctx, client, ns, serviceName)
+	service, err := getService(ctx, client, instance.GetNamespace(), serviceName)
 	if err == nil {
 		return service, false, nil
 	}
 
 	if errors.IsNotFound(err) {
-		service, err = generateGatewayService(client, instance, ns, serviceName)
+		service, err = generateGatewayService(client, instance, serviceName)
 		if err != nil {
 			return service, false, err
 		}
@@ -69,25 +68,18 @@ func getOrCreateGatewayService(ctx context.Context, client client.Client, instan
 }
 
 func getGatewayServiceName(instance *kubefilerv1alpha1.KubeFiler) string {
-	return strings.Join(
-		[]string{
-			instance.GetNamespace(),
-			instance.GetName(),
-			"service",
-		},
-		"-",
-	)
+	return instance.GetName() + "-kubefiler-service"
 }
 
 var svcSelectorKey = "kubefiler-operator.ctera.com/service"
 
-func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns, name string) (*corev1.Service, error) {
+func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.KubeFiler, name string) (*corev1.Service, error) {
 	// as of now we only generate ClusterIP type services
 	labels := labelsForKubeFiler(name)
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: ns,
+			Namespace: instance.GetNamespace(),
 			Labels:    labels,
 		},
 		Spec: corev1.ServiceSpec{

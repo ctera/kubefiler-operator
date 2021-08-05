@@ -47,17 +47,17 @@ func getPvc(ctx context.Context, client client.Client, ns, name string) (*corev1
 	return pvc, err
 }
 
-func getOrCreateGatewayPvc(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns string) (*corev1.PersistentVolumeClaim, bool, error) {
+func getOrCreateGatewayPvc(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler) (*corev1.PersistentVolumeClaim, bool, error) {
 	pvcName := getGatewayPvcName(instance)
 
 	// fetch the existing secret, if available
-	pvc, err := getPvc(ctx, client, ns, pvcName)
+	pvc, err := getPvc(ctx, client, instance.GetNamespace(), pvcName)
 	if err == nil {
 		return pvc, false, nil
 	}
 
 	if errors.IsNotFound(err) {
-		pvc, err = generateGatewayPvc(client, instance, ns, pvcName)
+		pvc, err = generateGatewayPvc(client, instance, pvcName)
 		if err != nil {
 			return pvc, false, err
 		}
@@ -79,12 +79,12 @@ func getGatewayPvcName(instance *kubefilerv1alpha1.KubeFiler) string {
 	return instance.GetName() + "-pvc"
 }
 
-func generateGatewayPvc(client client.Client, instance *kubefilerv1alpha1.KubeFiler, ns, name string) (*corev1.PersistentVolumeClaim, error) {
+func generateGatewayPvc(client client.Client, instance *kubefilerv1alpha1.KubeFiler, name string) (*corev1.PersistentVolumeClaim, error) {
 	// build a new pvc
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
-			Namespace: ns,
+			Namespace: instance.GetNamespace(),
 		},
 		Spec: *instance.Spec.Storage.Pvc.Spec,
 	}

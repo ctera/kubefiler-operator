@@ -19,8 +19,7 @@ type OperatorConfig struct {
 	GatewayContainerName string `mapstructure:"gateway-container-name"`
 	// GatewayStorageMountPath is where the storage volume should be mounted to
 	GatewayStorageMountPath string `mapstructure:"gateway-storage-path"`
-	// WorkingNamespace defines the namespace the operator will (generally)
-	// make changes in.
+	// WorkingNamespace defines the namespace for the operator's internal resources
 	WorkingNamespace string `mapstructure:"working-namespace"`
 }
 

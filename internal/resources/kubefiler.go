@@ -97,8 +97,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		return Requeue
 	}
 
-	destNamespace := m.cfg.WorkingNamespace
-	gatewaySecret, created, err := getOrCreateGatewaySecret(ctx, m.client, instance, destNamespace)
+	gatewaySecret, created, err := getOrCreateGatewaySecret(ctx, m.client, instance)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
@@ -107,7 +106,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 	}
 
 	if kubeFilerNeedsPvc(instance) {
-		pvc, created, err := getOrCreateGatewayPvc(ctx, m.client, instance, destNamespace)
+		pvc, created, err := getOrCreateGatewayPvc(ctx, m.client, instance)
 		if err != nil {
 			return Result{err: err}
 		} else if created {
@@ -122,7 +121,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		instance.Spec.Storage.Pvc.Name = pvc.Name
 	}
 
-	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal, destNamespace)
+	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
@@ -135,7 +134,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		return Requeue
 	}
 
-	_, created, err = getOrCreateGatewayService(ctx, m.client, instance, destNamespace)
+	_, created, err = getOrCreateGatewayService(ctx, m.client, instance)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
