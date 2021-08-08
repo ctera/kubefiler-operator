@@ -36,7 +36,9 @@ IMAGE_TAG_BASE ?= ctera.com/kubefiler-operator
 BUNDLE_IMG ?= $(IMAGE_TAG_BASE)-bundle:v$(VERSION)
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+TAG ?= latest
+IMG ?= 192.168.9.174:5000/ctera/kubefiler-operator:$(TAG)
+
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true,preserveUnknownFields=false"
 
