@@ -29,9 +29,9 @@ type OperatorConfig struct {
 func (oc *OperatorConfig) Validate() error {
 	// Ensure that WorkingNamespace is set. We don't default it to anything.
 	// It must be passed in, typically by the operator's own pod spec.
-	if oc.WorkingNamespace == "" {
-		return fmt.Errorf("WorkingNamespace value [%s] invalid", oc.WorkingNamespace)
-	}
+	// if oc.WorkingNamespace == "" {
+	// 	return fmt.Errorf("WorkingNamespace value [%s] invalid", oc.WorkingNamespace)
+	// }
 	return nil
 }
 

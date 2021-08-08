@@ -31,7 +31,7 @@ type KubeFilerPortalSpec struct {
 	// Hostname or IP address of the Portal
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MinLength:=1
-	Address string `json:"foo,omitempty"`
+	Address string `json:"address,omitempty"`
 
 	// Credentials for the Portal
 	// +kubebuilder:validation:Required

@@ -33,6 +33,7 @@ import (
 
 	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	"github.com/ctera/kubefiler-operator/controllers"
+	"github.com/ctera/kubefiler-operator/internal/conf"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -49,6 +50,7 @@ func init() {
 }
 
 func main() {
+	confSource := conf.NewSource()
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
@@ -65,6 +67,15 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
+	if err := conf.Load(confSource); err != nil {
+		setupLog.Error(err, "unable to configure")
+		os.Exit(1)
+	}
+	if err := conf.Get().Validate(); err != nil {
+		setupLog.Error(err, "invalid configuration")
+		os.Exit(1)
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
@@ -80,6 +91,7 @@ func main() {
 
 	if err = (&controllers.KubeFilerReconciler{
 		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("KubeFiler"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "KubeFiler")
 		os.Exit(1)

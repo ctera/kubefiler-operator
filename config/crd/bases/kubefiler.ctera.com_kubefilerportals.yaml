@@ -36,6 +36,10 @@ spec:
           spec:
             description: KubeFilerPortalSpec defines the desired state of KubeFilerPortal
             properties:
+              address:
+                description: Hostname or IP address of the Portal
+                minLength: 1
+                type: string
               credentials:
                 description: Credentials for the Portal
                 properties:
@@ -55,10 +59,6 @@ spec:
                       that stores the Username
                     type: string
                 type: object
-              foo:
-                description: Hostname or IP address of the Portal
-                minLength: 1
-                type: string
               trust:
                 default: false
                 description: Always trust the credentials provided by the Portal
