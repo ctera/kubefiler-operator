@@ -39,39 +39,52 @@ const (
 
 func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal) corev1.PodSpec {
 	volumes, mounts := getPodVolumesAndMounts(cfg, instance)
-	podEnv := getPodEnv(gatewaySecretName, kubeFilerPortal)
+	filerPodEnv := getFilerPodEnv(gatewaySecretName, kubeFilerPortal)
+	openAPIPodEnv := getOpenAPIPodEnv(gatewaySecretName)
 	privileged := true
 
 	podSpec := corev1.PodSpec{
 		Volumes: volumes,
-		Containers: []corev1.Container{{
-			Name:            cfg.GatewayContainerName,
-			Image:           cfg.GatewayContainerImage,
-			ImagePullPolicy: corev1.PullAlways,
-			Ports: []corev1.ContainerPort{{
-				ContainerPort: 443,
-				Name:          "mgmt",
-			}},
-			SecurityContext: &corev1.SecurityContext{
-				Privileged: &privileged,
-			},
-			Env:          podEnv,
-			VolumeMounts: mounts,
-			LivenessProbe: &corev1.Probe{
-				Handler: corev1.Handler{
-					TCPSocket: &corev1.TCPSocketAction{
-						Port: intstr.FromInt(443),
+		Containers: []corev1.Container{
+			{
+				Name:            cfg.GatewayContainerName,
+				Image:           cfg.GatewayContainerImage,
+				ImagePullPolicy: corev1.PullAlways,
+				Ports: []corev1.ContainerPort{{
+					ContainerPort: 443,
+					Name:          "mgmt",
+				}},
+				SecurityContext: &corev1.SecurityContext{
+					Privileged: &privileged,
+				},
+				Env:          filerPodEnv,
+				VolumeMounts: mounts,
+				LivenessProbe: &corev1.Probe{
+					Handler: corev1.Handler{
+						TCPSocket: &corev1.TCPSocketAction{
+							Port: intstr.FromInt(443),
+						},
+					},
+				},
+				Lifecycle: &corev1.Lifecycle{
+					PostStart: &corev1.Handler{
+						Exec: &corev1.ExecAction{
+							Command: []string{GatewayInitCommand},
+						},
 					},
 				},
 			},
-			Lifecycle: &corev1.Lifecycle{
-				PostStart: &corev1.Handler{
-					Exec: &corev1.ExecAction{
-						Command: []string{GatewayInitCommand},
-					},
-				},
+			{
+				Name:            cfg.GatewayOpenAPIContainerName,
+				Image:           cfg.GatewayOpenAPIContainerImage,
+				ImagePullPolicy: corev1.PullAlways,
+				Ports: []corev1.ContainerPort{{
+					ContainerPort: 9090,
+					Name:          "api",
+				}},
+				Env: openAPIPodEnv,
 			},
-		}},
+		},
 	}
 	return podSpec
 }
@@ -173,7 +186,7 @@ func localPathVolumeAndMount(volumeName, localPath, mountPath string, readOnly b
 	return volume, mount
 }
 
-func getPodEnv(gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal) []corev1.EnvVar {
+func getFilerPodEnv(gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name: "FILER_USERNAME",
@@ -232,6 +245,28 @@ func getPodEnv(gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.Kube
 			Name: "PORTAL_TRUST_CERTIFICATE",
 			// TODO Get from KubeFilerPortal
 			Value: "TRUE",
+		},
+	}
+	return env
+}
+
+func getOpenAPIPodEnv(secretName string) []corev1.EnvVar {
+	env := []corev1.EnvVar{
+		{
+			Name: "CTERA_FILER_JWT_SECRET",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: secretName,
+					},
+					Key: GatewayJwtSecretKey,
+				},
+			},
+		},
+		{
+			Name: "CTERA_FILER_TRUST_SSL",
+			// TODO Get from KubeFiler
+			Value: "Trust",
 		},
 	}
 	return env

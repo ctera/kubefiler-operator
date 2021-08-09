@@ -102,6 +102,13 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "KubeFilerPortal")
 		os.Exit(1)
 	}
+	if err = (&controllers.KubeFilerExportReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("KubeFilerExport"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "KubeFilerExport")
+		os.Exit(1)
+	}
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {

@@ -48,6 +48,19 @@ const (
 	GatewayPasswordNoUpper = false
 	// GatewayPasswordAllowRepeat sets whether the same charcter may repeat
 	GatewayPasswordAllowRepeat = false
+
+	// GatewayJwtSecretKey is the name of the key to read the JWT Token from when reading the secret
+	GatewayJwtSecretKey = "jwt_secret"
+	// GatewayJwtSecretLength is the length of the generated secret for the JWT encoding
+	GatewayJwtSecretLength = 16
+	// GatewayJwtSecretNumDigits is the amount of digits in the generated secret for the JWT encoding
+	GatewayJwtSecretNumDigits = 2
+	// GatewayJwtSecretNumSymbols is the amount of symbols in the generated secret for the JWT encoding
+	GatewayJwtSecretNumSymbols = 2
+	// GatewayJwtSecretNoUpper sets whether upper case letters may be used in the generated secret for the JWT encoding
+	GatewayJwtSecretNoUpper = false
+	// GatewayJwtSecretAllowRepeat sets whether the same charcter may repeat in the generated secret for the JWT encoding
+	GatewayJwtSecretAllowRepeat = false
 )
 
 func getSecret(ctx context.Context, client client.Client, ns, name string) (*corev1.Secret, error) {
@@ -65,7 +78,7 @@ func getSecret(ctx context.Context, client client.Client, ns, name string) (*cor
 }
 
 func getOrCreateGatewaySecret(ctx context.Context, client client.Client, instance *kubefilerv1alpha1.KubeFiler) (*corev1.Secret, bool, error) {
-	secretName := instance.GetName() + "-kubefiler-credentials"
+	secretName := getGatewaySecretName(instance)
 
 	// fetch the existing secret, if available
 	secret, err := getSecret(ctx, client, instance.GetNamespace(), secretName)
@@ -90,13 +103,28 @@ func getOrCreateGatewaySecret(ctx context.Context, client client.Client, instanc
 	return nil, false, err
 }
 
+func getGatewaySecretName(instance *kubefilerv1alpha1.KubeFiler) string {
+	return instance.GetName() + "-kubefiler-credentials"
+}
+
 func generateGatewaySecret(client client.Client, instance *kubefilerv1alpha1.KubeFiler, name string) (*corev1.Secret, error) {
-	pass, err := password.Generate(
+	filerPassword, err := password.Generate(
 		GatewayPasswordLength,
 		GatewayPasswordNumDigits,
 		GatewayPasswordNumSymbols,
 		GatewayPasswordNoUpper,
 		GatewayPasswordAllowRepeat,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	jwtSecret, err := password.Generate(
+		GatewayJwtSecretLength,
+		GatewayJwtSecretNumDigits,
+		GatewayJwtSecretNumSymbols,
+		GatewayJwtSecretNoUpper,
+		GatewayJwtSecretAllowRepeat,
 	)
 	if err != nil {
 		return nil, err
@@ -110,8 +138,9 @@ func generateGatewaySecret(client client.Client, instance *kubefilerv1alpha1.Kub
 		},
 		Immutable: &immutable,
 		StringData: map[string]string{
-			GatewayUsernameKey: GatewayDefaultUsername,
-			GatewayPasswordKey: pass,
+			GatewayUsernameKey:  GatewayDefaultUsername,
+			GatewayPasswordKey:  filerPassword,
+			GatewayJwtSecretKey: jwtSecret,
 		},
 	}
 

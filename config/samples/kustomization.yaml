@@ -2,4 +2,5 @@
 resources:
 - kubefiler_v1alpha1_kubefiler.yaml
 - kubefiler_v1alpha1_kubefilerportal.yaml
+- kubefiler_v1alpha1_kubefilerexport.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

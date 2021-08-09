@@ -1,0 +1,8 @@
+apiVersion: kubefiler.ctera.com/v1alpha1
+kind: KubeFilerExport
+metadata:
+  name: kubefilerexport-sample
+spec:
+  # Add fields here
+  kubefiler: kubefiler-sample
+  path: "cloud/users/Ygal Blum/My Files/s3"
