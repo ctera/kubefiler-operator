@@ -1,7 +1,21 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: portal-credentials-secret
+type: kubernetes.io/basic-auth
+stringData:
+  username: admin
+  password: password1!
+---
 apiVersion: kubefiler.ctera.com/v1alpha1
 kind: KubeFilerPortal
 metadata:
   name: kubefilerportal-sample
 spec:
   # Add fields here
-  foo: bar
+  address: 192.168.9.111
+  credentials:
+    secret: portal-credentials-secret
+    username_key: username
+    password_key: password
+  trust: true
