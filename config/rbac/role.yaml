@@ -82,6 +82,32 @@ rules:
 - apiGroups:
   - kubefiler.ctera.com
   resources:
+  - kubefilerexports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubefiler.ctera.com
+  resources:
+  - kubefilerexports/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - kubefiler.ctera.com
+  resources:
+  - kubefilerexports/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - kubefiler.ctera.com
+  resources:
   - kubefilerportals
   verbs:
   - create

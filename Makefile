@@ -91,7 +91,7 @@ ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 REPORTS_DIR=reports
 COVERAGE_REPORT_FILE=${REPORTS_DIR}/coverage.cov
 COVERAGE_HTML_FILE=${REPORTS_DIR}/coverage.html
-MINIMAL_COVERAGE_RATE=50
+MINIMAL_COVERAGE_RATE=35
 test: manifests generate fmt vet ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	mkdir -p ${REPORTS_DIR}
@@ -215,6 +215,7 @@ catalog-push: ## Push a catalog image.
 
 check: check-revive check-format vet
 
+CHECK_GOFMT_FLAGS ?= -e -s -l
 check-format:
 	! gofmt $(CHECK_GOFMT_FLAGS) . | sed 's,^,formatting error: ,' | grep 'go$$'
 
@@ -246,3 +247,15 @@ else
 	@echo "revive found in PATH"
 REVIVE=$(shell command -v revive ;)
 endif
+
+OPENAPI_FILE?="https://raw.githubusercontent.com/ctera/ctera-gateway-openapi/master/ctera_gateway_openapi/api.yml"
+.PHONY: gateway-client
+gateway-client:
+	GO_POST_PROCESS_FILE="/usr/local/go/bin/gofmt -w -s" \
+	java -jar ~/jars/openapi-generator-cli.jar generate \
+	-i ${OPENAPI_FILE} \
+	-g go \
+	-o pkg/ctera-openapi \
+	--additional-properties packageName=cteraopenapi,packageVersion=1.0.0,isGoSubmodule=true \
+    --type-mappings=object=interface{} \
+	--enable-post-process-file

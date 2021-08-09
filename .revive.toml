@@ -42,7 +42,7 @@ warningCode = 0
 [rule.argument-limit]
   arguments = [8]
 [rule.function-result-limit]
-  arguments = [3]
+  arguments = [4]
 
 [rule.unhandled-error]
   # functions to ignore unhandled errors on

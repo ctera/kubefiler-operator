@@ -2,6 +2,7 @@
 FROM golang:1.16 as builder
 
 WORKDIR /workspace
+COPY pkg/ pkg/
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum

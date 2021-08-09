@@ -84,11 +84,18 @@ func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.Ku
 		},
 		Spec: corev1.ServiceSpec{
 			Type: corev1.ServiceTypeClusterIP,
-			Ports: []corev1.ServicePort{{
-				Name:     "mgmt",
-				Protocol: corev1.ProtocolTCP,
-				Port:     443,
-			}},
+			Ports: []corev1.ServicePort{
+				{
+					Name:     "mgmt",
+					Protocol: corev1.ProtocolTCP,
+					Port:     443,
+				},
+				{
+					Name:     "openapi",
+					Protocol: corev1.ProtocolTCP,
+					Port:     9090,
+				},
+			},
 			Selector: map[string]string{
 				svcSelectorKey: labels[svcSelectorKey],
 			},
