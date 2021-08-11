@@ -67,7 +67,7 @@ func TestGetDeployment(t *testing.T) {
 func TestGetOrCreateGatewayDeployment(t *testing.T) {
 	instanceNamespace := "instanceNamespace"
 	instanceName := "instanceName"
-	deploymentName := instanceName + "-kubefiler-deployment"
+	deploymentName := instanceName + "-kubefiler"
 
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{

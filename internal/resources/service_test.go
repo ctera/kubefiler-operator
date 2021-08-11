@@ -62,7 +62,7 @@ func TestGetService(t *testing.T) {
 func TestGetOrCreateGatewayService(t *testing.T) {
 	instanceNamespace := "instanceNamespace"
 	instanceName := "instanceName"
-	serviceName := instanceName + "-kubefiler-service"
+	serviceName := instanceName + "-kubefiler"
 
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{

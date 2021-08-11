@@ -68,7 +68,7 @@ func getOrCreateGatewayService(ctx context.Context, client client.Client, instan
 }
 
 func getGatewayServiceName(instance *kubefilerv1alpha1.KubeFiler) string {
-	return instance.GetName() + "-kubefiler-service"
+	return instance.GetName() + "-kubefiler"
 }
 
 var svcSelectorKey = "kubefiler-operator.ctera.com/service"

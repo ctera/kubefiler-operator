@@ -73,7 +73,7 @@ func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg
 }
 
 func getGatewayDeploymentName(instance *kubefilerv1alpha1.KubeFiler) string {
-	return instance.GetName() + "-kubefiler-deployment"
+	return instance.GetName() + "-kubefiler"
 }
 
 func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
