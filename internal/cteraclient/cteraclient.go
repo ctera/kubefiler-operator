@@ -22,7 +22,7 @@ import (
 	"context"
 	"fmt"
 
-	ctera "github.com/ctera/kubefiler-operator/pkg/ctera-openapi"
+	ctera "github.com/ctera/ctera-gateway-openapi-go-client"
 )
 
 // Error error type for Ctera Client errors

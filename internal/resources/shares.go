@@ -22,8 +22,8 @@ import (
 
 	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 
+	ctera "github.com/ctera/ctera-gateway-openapi-go-client"
 	"github.com/ctera/kubefiler-operator/internal/cteraclient"
-	ctera "github.com/ctera/kubefiler-operator/pkg/ctera-openapi"
 )
 
 func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv1alpha1.KubeFilerExport) (*ctera.Share, bool, error) {

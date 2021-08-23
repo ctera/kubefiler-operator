@@ -3,7 +3,7 @@ module github.com/ctera/kubefiler-operator
 go 1.16
 
 require (
-	github.com/ctera/kubefiler-operator/pkg/ctera-openapi v1.0.0
+	github.com/ctera/ctera-gateway-openapi-go-client v0.0.0-20210823130300-9b654e0e43ca
 	github.com/go-logr/logr v0.3.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/onsi/ginkgo v1.14.1
@@ -18,5 +18,3 @@ require (
 	k8s.io/client-go v0.20.2
 	sigs.k8s.io/controller-runtime v0.8.3
 )
-
-replace github.com/ctera/kubefiler-operator/pkg/ctera-openapi v1.0.0 => ./pkg/ctera-openapi
