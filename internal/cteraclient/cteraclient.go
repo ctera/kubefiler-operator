@@ -108,10 +108,12 @@ func (c *CteraClient) GetShareSafe(name string) (*ctera.Share, error) {
 	return &share, nil
 }
 
-// CreateShare creates a share with the provided name and path
+// CreateShare creates a share with the provided name and path and exports it to NFS
 func (c *CteraClient) CreateShare(name, path string) (*ctera.Share, error) {
 	share := ctera.NewShare(name)
 	share.Directory = &path
+	exportToNfs := true
+	share.ExportToNfs = &exportToNfs
 	// TODO Do we need to override any default parameters
 
 	_, err := c.client.SharesApi.SharesPost(*c.ctx).Share(*share).Execute()
