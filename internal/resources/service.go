@@ -95,6 +95,56 @@ func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.Ku
 					Protocol: corev1.ProtocolTCP,
 					Port:     9090,
 				},
+				{
+					Name:     "rpcbind-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     111,
+				},
+				{
+					Name:     "rpcbind-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     111,
+				},
+				{
+					Name:     "nfs-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     2049,
+				},
+				{
+					Name:     "nfs-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     2049,
+				},
+				{
+					Name:     "mountd-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     40892,
+				},
+				{
+					Name:     "mountd-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     40892,
+				},
+				{
+					Name:     "statd-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     40662,
+				},
+				{
+					Name:     "statd-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     40662,
+				},
+				{
+					Name:     "lockd-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     42803,
+				},
+				{
+					Name:     "lockd-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     42769,
+				},
 			},
 			Selector: map[string]string{
 				svcSelectorKey: labels[svcSelectorKey],
