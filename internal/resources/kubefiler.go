@@ -121,7 +121,12 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		instance.Spec.Storage.Pvc.Name = pvc.Name
 	}
 
-	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal)
+	serviceAccountName, result := getOrCreateFilerRole(ctx, m.client, instance, kubeFilerPortal)
+	if result != Done {
+		return result
+	}
+
+	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal, serviceAccountName)
 	if err != nil {
 		return Result{err: err}
 	} else if created {

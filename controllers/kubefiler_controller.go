@@ -40,6 +40,8 @@ type KubeFilerReconciler struct {
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=kubefiler.ctera.com,resources=kubefilers/finalizers,verbs=update
+// +kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=rbac.authorization.k8s.io,resources=roles;rolebindings,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core,resources=pods,verbs=get;list
 // +kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete

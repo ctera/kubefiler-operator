@@ -33,18 +33,19 @@ const (
 	CgroupDirLocalPath = "/sys/fs/cgroup"
 	// CgroupDirMountPath is the path for the "cgroup" directory inside the container
 	CgroupDirMountPath = "/sys/fs/cgroup"
-	// GatewayInitCommand is the path for the Gateway initialization script
-	GatewayInitCommand = "/gateway_init.py"
+	// kubeFilerInitCommand is the path for the Gateway initialization script
+	kubeFilerInitCommand = "/kubefiler_init.py"
 )
 
-func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal) corev1.PodSpec {
+func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, serviceAccountName string) corev1.PodSpec {
 	volumes, mounts := getPodVolumesAndMounts(cfg, instance)
-	filerPodEnv := getFilerPodEnv(gatewaySecretName, kubeFilerPortal)
+	filerPodEnv := getFilerPodEnv(instance)
 	openAPIPodEnv := getOpenAPIPodEnv(gatewaySecretName)
 	privileged := true
 
 	podSpec := corev1.PodSpec{
-		Volumes: volumes,
+		ServiceAccountName: serviceAccountName,
+		Volumes:            volumes,
 		Containers: []corev1.Container{
 			{
 				Name:            cfg.GatewayContainerName,
@@ -69,7 +70,7 @@ func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.K
 				Lifecycle: &corev1.Lifecycle{
 					PostStart: &corev1.Handler{
 						Exec: &corev1.ExecAction{
-							Command: []string{GatewayInitCommand},
+							Command: []string{kubeFilerInitCommand},
 						},
 					},
 				},
@@ -186,65 +187,11 @@ func localPathVolumeAndMount(volumeName, localPath, mountPath string, readOnly b
 	return volume, mount
 }
 
-func getFilerPodEnv(gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal) []corev1.EnvVar {
+func getFilerPodEnv(instance *kubefilerv1alpha1.KubeFiler) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name: "FILER_USERNAME",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: gatewaySecretName,
-					},
-					Key: GatewayUsernameKey,
-				},
-			},
-		},
-		{
-			Name: "FILER_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: gatewaySecretName,
-					},
-					Key: GatewayPasswordKey,
-				},
-			},
-		},
-		{
-			Name:  "PORTAL_ADDRESS",
-			Value: kubeFilerPortal.Spec.Address,
-		},
-		{
-			Name: "PORTAL_USERNAME",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: kubeFilerPortal.Spec.Credentials.Secret,
-					},
-					Key: kubeFilerPortal.Spec.Credentials.UsernameKey,
-				},
-			},
-		},
-		{
-			Name: "PORTAL_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: kubeFilerPortal.Spec.Credentials.Secret,
-					},
-					Key: kubeFilerPortal.Spec.Credentials.PasswordKey,
-				},
-			},
-		},
-		{
-			Name: "FILER_TRUST_CERTIFICATE",
-			// TODO Get from KubeFiler
-			Value: "TRUE",
-		},
-		{
-			Name: "PORTAL_TRUST_CERTIFICATE",
-			// TODO Get from KubeFilerPortal
-			Value: "TRUE",
+			Name:  "FILER_KUBEFILER_NAME",
+			Value: instance.GetName(),
 		},
 	}
 	return env

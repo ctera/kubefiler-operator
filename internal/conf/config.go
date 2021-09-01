@@ -49,8 +49,8 @@ type Source struct {
 // NewSource creates a new Source based on default configuration values.
 func NewSource() *Source {
 	v := viper.New()
-	v.SetDefault("gateway-container-image", "192.168.9.174:5000/gateway:last_build")
-	v.SetDefault("gateway-container-name", "gateway")
+	v.SetDefault("gateway-container-image", "192.168.9.174:5000/kubefiler-filer:last_build")
+	v.SetDefault("gateway-container-name", "kubefiler-filer")
 	v.SetDefault("gateway-storage-path", "/var/vol/2")
 	v.SetDefault("gateway-openapi-container-image", "192.168.9.174:5000/gateway-openapi:last_build")
 	v.SetDefault("gateway-openapi-container-name", "gateway-openapi")
