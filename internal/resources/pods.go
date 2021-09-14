@@ -37,7 +37,7 @@ const (
 	kubeFilerInitCommand = "/kubefiler_init.py"
 )
 
-func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, serviceAccountName string) corev1.PodSpec {
+func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, serviceAccountName string) corev1.PodSpec {
 	volumes, mounts := getPodVolumesAndMounts(cfg, instance)
 	filerPodEnv := getFilerPodEnv(instance)
 	openAPIPodEnv := getOpenAPIPodEnv(gatewaySecretName)

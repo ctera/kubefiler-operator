@@ -100,15 +100,6 @@ func TestGetOrCreateGatewayDeployment(t *testing.T) {
 		},
 	}
 
-	kubeFilerPortal := &kubefilerv1alpha1.KubeFilerPortal{
-		Spec: kubefilerv1alpha1.KubeFilerPortalSpec{
-			Address: "192.168.1.1",
-			Credentials: &kubefilerv1alpha1.KubeFilerPortalCredentialsSpec{
-				Secret: "GatewaySecret",
-			},
-		},
-	}
-
 	serviceAccountName := instanceName + "-filer"
 
 	testCases := []struct {
@@ -164,7 +155,7 @@ func TestGetOrCreateGatewayDeployment(t *testing.T) {
 			mockedClient.On("Create", ctx, mock.AnythingOfType("*v1.Deployment")).Return(tc.clientCreateReturn)
 		}
 
-		_, created, err := getOrCreateGatewayDeployment(ctx, mockedClient, cfg, instance, gatewaySecret, kubeFilerPortal, serviceAccountName)
+		_, created, err := getOrCreateGatewayDeployment(ctx, mockedClient, cfg, instance, gatewaySecret, serviceAccountName)
 
 		mockedClient.AssertExpectations(t)
 		assert.Equal(t, tc.created, created)

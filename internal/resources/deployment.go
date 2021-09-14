@@ -47,7 +47,7 @@ func getDeployment(ctx context.Context, client client.Client, ns, name string) (
 	return deployment, err
 }
 
-func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, serviceAccountName string) (*appsv1.Deployment, bool, error) {
+func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret, serviceAccountName string) (*appsv1.Deployment, bool, error) {
 	deploymentName := getGatewayDeploymentName(instance)
 
 	// fetch the existing secret, if available
@@ -57,7 +57,7 @@ func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg
 	}
 
 	if errors.IsNotFound(err) {
-		deployment, err = generateGatewayDeployment(deploymentName, cfg, instance, gatewaySecret.Name, kubeFilerPortal, client.Scheme(), serviceAccountName)
+		deployment, err = generateGatewayDeployment(deploymentName, cfg, instance, gatewaySecret.Name, client.Scheme(), serviceAccountName)
 		if err != nil {
 			return nil, false, err
 		}
@@ -76,8 +76,8 @@ func getGatewayDeploymentName(instance *kubefilerv1alpha1.KubeFiler) string {
 	return instance.GetName() + "-kubefiler"
 }
 
-func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, scheme *runtime.Scheme, serviceAccountName string) (*appsv1.Deployment, error) {
-	deployment, err := buildGatewayDeploymentSpec(name, cfg, instance, gatewaySecretName, kubeFilerPortal, serviceAccountName)
+func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, scheme *runtime.Scheme, serviceAccountName string) (*appsv1.Deployment, error) {
+	deployment, err := buildGatewayDeploymentSpec(name, cfg, instance, gatewaySecretName, serviceAccountName)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *
 	return deployment, err
 }
 
-func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, kubeFilerPortal *kubefilerv1alpha1.KubeFilerPortal, serviceAccountName string) (*appsv1.Deployment, error) {
+func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, serviceAccountName string) (*appsv1.Deployment, error) {
 	// construct a deployment based on the following labels
 	labels := labelsForKubeFiler(name)
 	var size int32 = 1
@@ -106,7 +106,7 @@ func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance 
 					Labels:      labels,
 					Annotations: annotationsForKubeFiler(cfg.GatewayContainerName),
 				},
-				Spec: buildGatewayPodSpec(cfg, instance, gatewaySecretName, kubeFilerPortal, serviceAccountName),
+				Spec: buildGatewayPodSpec(cfg, instance, gatewaySecretName, serviceAccountName),
 			},
 		},
 	}

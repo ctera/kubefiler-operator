@@ -126,7 +126,7 @@ func (m *KubeFilerManager) Update(ctx context.Context, instance *kubefilerv1alph
 		return result
 	}
 
-	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, kubeFilerPortal, serviceAccountName)
+	deployment, created, err := getOrCreateGatewayDeployment(ctx, m.client, m.cfg, instance, gatewaySecret, serviceAccountName)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
