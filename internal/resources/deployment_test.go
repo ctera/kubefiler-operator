@@ -100,8 +100,6 @@ func TestGetOrCreateGatewayDeployment(t *testing.T) {
 		},
 	}
 
-	serviceAccountName := instanceName + "-filer"
-
 	testCases := []struct {
 		testName            string
 		clientGetReturn     error
@@ -155,7 +153,7 @@ func TestGetOrCreateGatewayDeployment(t *testing.T) {
 			mockedClient.On("Create", ctx, mock.AnythingOfType("*v1.Deployment")).Return(tc.clientCreateReturn)
 		}
 
-		_, created, err := getOrCreateGatewayDeployment(ctx, mockedClient, cfg, instance, gatewaySecret, serviceAccountName)
+		_, created, err := getOrCreateGatewayDeployment(ctx, mockedClient, cfg, instance, gatewaySecret)
 
 		mockedClient.AssertExpectations(t)
 		assert.Equal(t, tc.created, created)

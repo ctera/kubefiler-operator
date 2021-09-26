@@ -17,9 +17,12 @@ limitations under the License.
 package resources
 
 import (
+	"context"
+
 	kubefilerv1alpha1 "github.com/ctera/kubefiler-operator/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/ctera/kubefiler-operator/internal/conf"
 )
@@ -33,19 +36,31 @@ const (
 	CgroupDirLocalPath = "/sys/fs/cgroup"
 	// CgroupDirMountPath is the path for the "cgroup" directory inside the container
 	CgroupDirMountPath = "/sys/fs/cgroup"
-	// kubeFilerInitCommand is the path for the Gateway initialization script
-	kubeFilerInitCommand = "/kubefiler_init.py"
 )
 
-func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, serviceAccountName string) corev1.PodSpec {
+func getPodsForInstance(ctx context.Context, k8sClient client.Client, instance *kubefilerv1alpha1.KubeFiler) (*corev1.PodList, error) {
+	pods := corev1.PodList{}
+
+	err := k8sClient.List(
+		ctx,
+		&pods,
+		client.InNamespace(instance.GetNamespace()),
+		client.MatchingLabels{
+			instanceLabel: labelValue("kubefiler", getGatewayDeploymentName(instance)),
+		},
+	)
+
+	return &pods, err
+}
+
+func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string) corev1.PodSpec {
 	volumes, mounts := getPodVolumesAndMounts(cfg, instance)
 	filerPodEnv := getFilerPodEnv(instance)
 	openAPIPodEnv := getOpenAPIPodEnv(gatewaySecretName)
 	privileged := true
 
 	podSpec := corev1.PodSpec{
-		ServiceAccountName: serviceAccountName,
-		Volumes:            volumes,
+		Volumes: volumes,
 		Containers: []corev1.Container{
 			{
 				Name:            cfg.GatewayContainerName,
@@ -60,17 +75,17 @@ func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.K
 				},
 				Env:          filerPodEnv,
 				VolumeMounts: mounts,
-				LivenessProbe: &corev1.Probe{
+				ReadinessProbe: &corev1.Probe{
 					Handler: corev1.Handler{
 						TCPSocket: &corev1.TCPSocketAction{
 							Port: intstr.FromInt(443),
 						},
 					},
 				},
-				Lifecycle: &corev1.Lifecycle{
-					PostStart: &corev1.Handler{
-						Exec: &corev1.ExecAction{
-							Command: []string{kubeFilerInitCommand},
+				LivenessProbe: &corev1.Probe{
+					Handler: corev1.Handler{
+						TCPSocket: &corev1.TCPSocketAction{
+							Port: intstr.FromInt(443),
 						},
 					},
 				},

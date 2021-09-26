@@ -26,7 +26,7 @@ import (
 	"github.com/ctera/kubefiler-operator/internal/cteraclient"
 )
 
-func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv1alpha1.KubeFilerExport) (*ctera.Share, bool, error) {
+func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv1alpha1.KubeFilerExport, trustedNfsClients []ctera.NFSv3AccessControlEntry) (*ctera.Share, bool, error) {
 	share, err := cteraClient.GetShareSafe(instance.GetName())
 	if err != nil {
 		return nil, false, err
@@ -39,7 +39,8 @@ func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv
 		return nil, false, status.Errorf(codes.AlreadyExists, "Share already exists with different parameters. Share Path=%s, Requested Path=%s", share.GetDirectory(), instance.Spec.Path)
 	}
 
-	share, err = cteraClient.CreateShare(instance.GetName(), instance.Spec.Path)
+	shareUuid := instance.Annotations[shareUuidAnnotation]
+	share, err = cteraClient.CreateShare(instance.GetName(), instance.Spec.Path, &shareUuid, trustedNfsClients)
 	if err != nil {
 		return nil, false, status.Error(codes.Internal, err.Error())
 	}

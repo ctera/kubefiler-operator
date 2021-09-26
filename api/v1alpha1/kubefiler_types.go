@@ -58,10 +58,51 @@ type KubeFilerPvcSpec struct {
 	Spec *corev1.PersistentVolumeClaimSpec `json:"spec,omitempty"`
 }
 
+// KubeFilerPhase is a label for the condition of a kubefiler at the current time.
+type KubeFilerPhase string
+
+// These are the valid statuses of pods.
+const (
+	// KubeFilerPending means the kubefiler has been accepted by the system, but the deployment of its child
+	// resources has not yet started
+	KubeFilerPending KubeFilerPhase = "Pending"
+	// KubeFilerDeploying means that the system is currently deploying the kubefiler's child resources
+	KubeFilerDeploying KubeFilerPhase = "Deploying"
+	// KubeFilerDeployed means that the system has completed deploying the kubefiler's child resources and is now waiting
+	// for them to start
+	KubeFilerDeployed KubeFilerPhase = "Deployed"
+	// KubeFilerConfiguring means that the kubefiler's child resources are running and are being configured
+	KubeFilerConfiguring KubeFilerPhase = "Configuring"
+	// KubeFilerRunning means the kubefiler's child resources are configured and running as expected
+	KubeFilerRunning KubeFilerPhase = "Running"
+	// KubeFilerError means that one of the kubefiler's child resources is in error state
+	KubeFilerError KubeFilerPhase = "Error"
+	// KubeFilerUnknown means that for some reason the state of the kubefiler could not be obtained, typically due
+	// to an error in communicating with the host of the filer.
+	KubeFilerUnknown KubeFilerPhase = "Unknown"
+)
+
 // KubeFilerStatus defines the observed state of KubeFiler
 type KubeFilerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// The phase of a KubeFiler is a simple, high-level summary of where the KubeFiler is in its lifecycle.
+	// The status of the kubefiler's child resources contain more detail about the kubefiler's status.
+	// There are seven possible phase values:
+	// Pending: The kubefiler has been accepted by the system, but the deployment of its child
+	// resources has not yet started
+	// Deploying: The system is currently deploying the kubefiler's child resources
+	// Deployed: The system has completed deploying the kubefiler's child resources and is now waiting
+	// for them to start
+	// Configuring: The kubefiler's child resources are running and are being configured
+	// Running: The kubefiler's child resources are configured and running as expected
+	// Error: One of the kubefiler's child resources is in error state
+	// Unknown: For some reason the state of the kubefiler could not be obtained, typically due
+	// to an error in communicating with the host of the filer.
+	//
+	// +optional
+	Phase KubeFilerPhase `json:"phase,omitempty" protobuf:"bytes,1,opt,name=phase,casttype=KubeFilerPhase"`
 }
 
 //+kubebuilder:object:root=true

@@ -36,6 +36,7 @@ rules:
   - events
   verbs:
   - create
+  - patch
 - apiGroups:
   - ""
   resources:
@@ -55,22 +56,11 @@ rules:
   verbs:
   - get
   - list
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - ""
   resources:
-  - serviceaccounts
+  - secrets
   verbs:
   - create
   - delete
@@ -170,15 +160,10 @@ rules:
   - patch
   - update
 - apiGroups:
-  - rbac.authorization.k8s.io
+  - storage.k8s.io
   resources:
-  - rolebindings
-  - roles
+  - volumeattachments
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch

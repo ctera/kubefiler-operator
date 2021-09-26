@@ -19,6 +19,7 @@ package resources
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -30,7 +31,10 @@ import (
 	"github.com/ctera/kubefiler-operator/internal/cteraclient"
 )
 
-const kubeFilerExportFinalizer = "kubefiler-operator.ctera.com/kubeFilerExportFinalizer"
+const (
+	kubeFilerExportFinalizer = "kubefiler-operator.ctera.com/kubeFilerExportFinalizer"
+	shareUuidAnnotation      = "kubefiler-operator.ctera.com/shareUuid"
+)
 
 // KubeFilerExportManager is used to manage KubeFilerExport resources.
 type KubeFilerExportManager struct {
@@ -99,12 +103,20 @@ func (m *KubeFilerExportManager) Update(ctx context.Context, instance *kubefiler
 		return Requeue
 	}
 
+	changed, err = m.addUuid(ctx, instance)
+	if err != nil {
+		return Result{err: err}
+	} else if changed {
+		m.logger.Info("Uuid added")
+		return Requeue
+	}
+
 	cteraClient, err := cteraclient.GetAuthenticatedCteraClient(ctx, m.logger, filerAddress, filerUsername, filerPassword)
 	if err != nil {
 		return Result{err: err}
 	}
 
-	_, created, err := getOrCreateShare(cteraClient, instance)
+	_, created, err := getOrCreateShare(cteraClient, instance, nil)
 	if err != nil {
 		return Result{err: err}
 	} else if created {
@@ -183,6 +195,22 @@ func (m *KubeFilerExportManager) getFilerLoginDetails(ctx context.Context, insta
 		string(kubeFilerSecret.Data[GatewayUsernameKey]),
 		string(kubeFilerSecret.Data[GatewayPasswordKey]),
 		nil
+}
+
+func (m *KubeFilerExportManager) addUuid(ctx context.Context, instance *kubefilerv1alpha1.KubeFilerExport) (bool, error) {
+	_, found := instance.Annotations[shareUuidAnnotation]
+	if found {
+		return false, nil
+	}
+
+	shareUuid, err := uuid.NewRandom()
+	if err != nil {
+		m.logger.Error(err, "Failed to create a UUID")
+		return false, err
+	}
+
+	instance.Annotations[shareUuidAnnotation] = shareUuid.String()
+	return true, m.client.Update(ctx, instance)
 }
 
 func (m *KubeFilerExportManager) addFinalizer(ctx context.Context, instance *kubefilerv1alpha1.KubeFilerExport) (bool, error) {

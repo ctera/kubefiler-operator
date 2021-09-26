@@ -26,4 +26,11 @@ const (
 const (
 	ReasonCreatedPersistentVolumeClaim = "CreatedPersistentVolumeClaim"
 	ReasonCreatedDeployment            = "CreatedDeployment"
+	ReasonCreatedService               = "CreatedService"
+	ReasonReadyForConfiguration        = "ReadyForConfiguration"
+	ReasonFirstUserCreated             = "FirstUserCreated"
+	ReasonConnectedToPortal            = "ConnectedToPortal"
+	ReasonExportsConfigured            = "ExportsConfigured"
+	ReasonConfiguredSuccessfully       = "ConfiguredSuccessfully"
+	ReasonNotRunning                   = "NotRunning"
 )

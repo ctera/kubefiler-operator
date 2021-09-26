@@ -33,6 +33,10 @@ import (
 	"github.com/ctera/kubefiler-operator/internal/conf"
 )
 
+const (
+	instanceLabel = "app.kubernetes.io/instance"
+)
+
 func getDeployment(ctx context.Context, client client.Client, ns, name string) (*appsv1.Deployment, error) {
 	deployment := &appsv1.Deployment{}
 	err := client.Get(
@@ -47,7 +51,7 @@ func getDeployment(ctx context.Context, client client.Client, ns, name string) (
 	return deployment, err
 }
 
-func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret, serviceAccountName string) (*appsv1.Deployment, bool, error) {
+func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecret *corev1.Secret) (*appsv1.Deployment, bool, error) {
 	deploymentName := getGatewayDeploymentName(instance)
 
 	// fetch the existing secret, if available
@@ -57,7 +61,7 @@ func getOrCreateGatewayDeployment(ctx context.Context, client client.Client, cfg
 	}
 
 	if errors.IsNotFound(err) {
-		deployment, err = generateGatewayDeployment(deploymentName, cfg, instance, gatewaySecret.Name, client.Scheme(), serviceAccountName)
+		deployment, err = generateGatewayDeployment(deploymentName, cfg, instance, gatewaySecret.Name, client.Scheme())
 		if err != nil {
 			return nil, false, err
 		}
@@ -76,8 +80,8 @@ func getGatewayDeploymentName(instance *kubefilerv1alpha1.KubeFiler) string {
 	return instance.GetName() + "-kubefiler"
 }
 
-func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, scheme *runtime.Scheme, serviceAccountName string) (*appsv1.Deployment, error) {
-	deployment, err := buildGatewayDeploymentSpec(name, cfg, instance, gatewaySecretName, serviceAccountName)
+func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+	deployment, err := buildGatewayDeploymentSpec(name, cfg, instance, gatewaySecretName)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +89,7 @@ func generateGatewayDeployment(name string, cfg *conf.OperatorConfig, instance *
 	return deployment, err
 }
 
-func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string, serviceAccountName string) (*appsv1.Deployment, error) {
+func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.KubeFiler, gatewaySecretName string) (*appsv1.Deployment, error) {
 	// construct a deployment based on the following labels
 	labels := labelsForKubeFiler(name)
 	var size int32 = 1
@@ -106,7 +110,7 @@ func buildGatewayDeploymentSpec(name string, cfg *conf.OperatorConfig, instance 
 					Labels:      labels,
 					Annotations: annotationsForKubeFiler(cfg.GatewayContainerName),
 				},
-				Spec: buildGatewayPodSpec(cfg, instance, gatewaySecretName, serviceAccountName),
+				Spec: buildGatewayPodSpec(cfg, instance, gatewaySecretName),
 			},
 		},
 	}
@@ -122,7 +126,7 @@ func labelsForKubeFiler(name string) map[string]string {
 		// k8s namespaced labels
 		// See: https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
 		"app.kubernetes.io/name":       "kubefiler",
-		"app.kubernetes.io/instance":   labelValue("kubefiler", name),
+		instanceLabel:                  labelValue("kubefiler", name),
 		"app.kubernetes.io/component":  "kubefiler",
 		"app.kubernetes.io/part-of":    "kubefiler",
 		"app.kubernetes.io/managed-by": "kubefiler-operator",
