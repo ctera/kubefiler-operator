@@ -39,6 +39,11 @@ func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv
 		return nil, false, status.Errorf(codes.AlreadyExists, "Share already exists with different parameters. Share Path=%s, Requested Path=%s", share.GetDirectory(), instance.Spec.Path)
 	}
 
+	if trustedNfsClients == nil {
+		trustedNfsClients = make([]ctera.NFSv3AccessControlEntry, 0)
+	}
+	trustedNfsClients = append(trustedNfsClients, *ctera.NewNFSv3AccessControlEntry("127.0.0.1", "255.255.255.255", ctera.RW))
+
 	shareUuid := instance.Annotations[shareUuidAnnotation]
 	share, err = cteraClient.CreateShare(instance.GetName(), instance.Spec.Path, &shareUuid, trustedNfsClients)
 	if err != nil {

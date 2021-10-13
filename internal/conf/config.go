@@ -19,11 +19,16 @@ type OperatorConfig struct {
 	GatewayContainerName string `mapstructure:"gateway-container-name"`
 	// GatewayStorageMountPath is where the storage volume should be mounted to
 	GatewayStorageMountPath string `mapstructure:"gateway-storage-path"`
-	// GatewayOpenAPIContainerImage can be used to select alternate container sources.
+	// GatewayOpenAPIContainerImage can be used to select alternate container sources for the OpenAPI server.
 	GatewayOpenAPIContainerImage string `mapstructure:"gateway-openapi-container-image"`
-	// GatewayContainerName can be used to set the name of the primary container,
+	// GatewayOpenAPIContainerName can be used to set the name of the for the OpenAPI server container,
 	// the one running gateway, in the pod.
 	GatewayOpenAPIContainerName string `mapstructure:"gateway-openapi-container-name"`
+	// GatewayNfsProxyContainerImage can be used to select alternate container sources for the OpenAPI server.
+	GatewayNfsProxyContainerImage string `mapstructure:"gateway-nfs-proxy-container-image"`
+	// GatewayNfsProxyContainerName can be used to set the name of the for the OpenAPI server container,
+	// the one running gateway, in the pod.
+	GatewayNfsProxyContainerName string `mapstructure:"gateway-nfs-proxy-container-name"`
 	// WorkingNamespace defines the namespace for the operator's internal resources
 	WorkingNamespace string `mapstructure:"working-namespace"`
 }
@@ -54,6 +59,8 @@ func NewSource() *Source {
 	v.SetDefault("gateway-storage-path", "/var/vol/2")
 	v.SetDefault("gateway-openapi-container-image", "192.168.9.174:5000/gateway-openapi:last_build")
 	v.SetDefault("gateway-openapi-container-name", "gateway-openapi")
+	v.SetDefault("gateway-nfs-proxy-container-image", "192.168.9.174:5000/kubefiler-nfs-proxy:last_build")
+	v.SetDefault("gateway-nfs-proxy-container-name", "gateway-nfs-proxy")
 	v.SetDefault("working-namespace", "")
 	return &Source{v: v}
 }

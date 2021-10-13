@@ -100,6 +100,15 @@ func buildGatewayPodSpec(cfg *conf.OperatorConfig, instance *kubefilerv1alpha1.K
 				}},
 				Env: openAPIPodEnv,
 			},
+			{
+				Name:            cfg.GatewayNfsProxyContainerName,
+				Image:           cfg.GatewayNfsProxyContainerImage,
+				ImagePullPolicy: corev1.PullAlways,
+				Ports: []corev1.ContainerPort{{
+					ContainerPort: 22049,
+					Name:          "nfs",
+				}},
+			},
 		},
 	}
 	return podSpec

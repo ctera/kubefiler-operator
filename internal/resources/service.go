@@ -106,16 +106,6 @@ func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.Ku
 					Port:     111,
 				},
 				{
-					Name:     "nfs-tcp",
-					Protocol: corev1.ProtocolTCP,
-					Port:     2049,
-				},
-				{
-					Name:     "nfs-udp",
-					Protocol: corev1.ProtocolUDP,
-					Port:     2049,
-				},
-				{
 					Name:     "mountd-tcp",
 					Protocol: corev1.ProtocolTCP,
 					Port:     40892,
@@ -144,6 +134,16 @@ func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.Ku
 					Name:     "lockd-udp",
 					Protocol: corev1.ProtocolUDP,
 					Port:     42769,
+				},
+				{
+					Name:     "nfs-proxy-tcp",
+					Protocol: corev1.ProtocolTCP,
+					Port:     22049,
+				},
+				{
+					Name:     "nfs-proxy-udp",
+					Protocol: corev1.ProtocolUDP,
+					Port:     22049,
 				},
 			},
 			Selector: map[string]string{
