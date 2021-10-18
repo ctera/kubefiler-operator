@@ -192,11 +192,11 @@ func (c *CteraClient) EnableCache() (bool, error) {
 }
 
 func (c *CteraClient) UnsuspendSync() (bool, error) {
-	syncIsSuspended, _, err := c.client.SyncApi.CteraGatewayOpenapiApiSyncIsEnabled(*c.ctx).Execute()
+	syncIsEnabled, _, err := c.client.SyncApi.CteraGatewayOpenapiApiSyncIsEnabled(*c.ctx).Execute()
 	if err != nil {
-		c.logger.Error(err, "Failed to check is sync is suspended")
+		c.logger.Error(err, "Failed to check is sync is enabled")
 		return false, err
-	} else if !syncIsSuspended {
+	} else if syncIsEnabled {
 		return false, nil
 	}
 

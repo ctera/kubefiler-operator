@@ -30,6 +30,7 @@ const (
 	ReasonReadyForConfiguration        = "ReadyForConfiguration"
 	ReasonFirstUserCreated             = "FirstUserCreated"
 	ReasonConnectedToPortal            = "ConnectedToPortal"
+	ReasonCacheGatewayStarted          = "CacheGatewayStarted"
 	ReasonExportsConfigured            = "ExportsConfigured"
 	ReasonConfiguredSuccessfully       = "ConfiguredSuccessfully"
 	ReasonNotRunning                   = "NotRunning"

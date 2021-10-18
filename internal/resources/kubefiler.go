@@ -218,7 +218,7 @@ func (m *KubeFilerManager) Configure(ctx context.Context, instance *kubefilerv1a
 		return result
 	}
 
-	result = m.startCachingGateway(cteraClient)
+	result = m.startCachingGateway(instance, cteraClient)
 	if result != Done {
 		return result
 	}
@@ -330,7 +330,7 @@ func (m *KubeFilerManager) connectToPortal(ctx context.Context, instance *kubefi
 	return Done
 }
 
-func (m *KubeFilerManager) startCachingGateway(cteraClient *cteraclient.CteraClient) Result {
+func (m *KubeFilerManager) startCachingGateway(instance *kubefilerv1alpha1.KubeFiler, cteraClient *cteraclient.CteraClient) Result {
 	changed, err := cteraClient.EnableCache()
 	if err != nil {
 		return Result{err: err}
@@ -347,11 +347,11 @@ func (m *KubeFilerManager) startCachingGateway(cteraClient *cteraclient.CteraCli
 		return Requeue
 	}
 
-	err = cteraClient.RefreshFolders()
-	if err != nil {
-		return Result{err: err}
-	}
-	m.logger.Info("Folders were refreshed successfully")
+	m.recorder.Eventf(instance,
+		EventNormal,
+		ReasonCacheGatewayStarted,
+		"Filer was configured as Cache Gateway and Sync was unsuspended successfully",
+	)
 
 	return Done
 }
