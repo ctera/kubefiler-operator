@@ -277,6 +277,20 @@ func (c *CteraClient) RemoveTrustedNfsClient(shareName, address, netmask string)
 	return err
 }
 
+func (c *CteraClient) GetNfsConfiguration() (*ctera.NfsConfiguration, error) {
+	conf, _, err := c.client.NfsApi.CteraGatewayOpenapiApiNfsGetConfiguration(*c.ctx).Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	return &conf, nil
+}
+
+func (c *CteraClient) SetNfsConfiguration(configuration *ctera.NfsConfiguration) error {
+	_, err := c.client.NfsApi.CteraGatewayOpenapiApiNfsModify(*c.ctx).NfsConfiguration(*configuration).Execute()
+	return err
+}
+
 func (*CteraClient) getStatusFromError(err error) int32 {
 	genericOpenAPIError, ok := err.(ctera.GenericOpenAPIError)
 	if !ok {
