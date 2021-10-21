@@ -108,32 +108,22 @@ func generateGatewayService(client client.Client, instance *kubefilerv1alpha1.Ku
 				{
 					Name:     "mountd-tcp",
 					Protocol: corev1.ProtocolTCP,
-					Port:     40892,
+					Port:     kubeFilerNfsMountdPort,
 				},
 				{
 					Name:     "mountd-udp",
 					Protocol: corev1.ProtocolUDP,
-					Port:     40892,
+					Port:     kubeFilerNfsMountdPort,
 				},
 				{
 					Name:     "statd-tcp",
 					Protocol: corev1.ProtocolTCP,
-					Port:     40662,
+					Port:     kubeFilerNfsStatdPort,
 				},
 				{
 					Name:     "statd-udp",
 					Protocol: corev1.ProtocolUDP,
-					Port:     40662,
-				},
-				{
-					Name:     "lockd-tcp",
-					Protocol: corev1.ProtocolTCP,
-					Port:     42803,
-				},
-				{
-					Name:     "lockd-udp",
-					Protocol: corev1.ProtocolUDP,
-					Port:     42769,
+					Port:     kubeFilerNfsStatdPort,
 				},
 				{
 					Name:     "nfs-proxy-tcp",

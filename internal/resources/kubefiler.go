@@ -33,7 +33,13 @@ import (
 	"github.com/ctera/kubefiler-operator/internal/cteraclient"
 )
 
-const kubeFilerFinalizer = "kubefiler-operator.ctera.com/kubeFilerFinalizer"
+const (
+	kubeFilerFinalizer = "kubefiler-operator.ctera.com/kubeFilerFinalizer"
+
+	kubeFilerNfsMountdPort = 40892
+	kubeFilerNfsStatdPort  = 40662
+	kubeFilerNfsNfsdHost   = "127.0.0.1"
+)
 
 // KubeFilerManager is used to manage KubeFiler resources.
 type KubeFilerManager struct {
@@ -223,6 +229,11 @@ func (m *KubeFilerManager) Configure(ctx context.Context, instance *kubefilerv1a
 		return result
 	}
 
+	result = m.configureNfsServer(cteraClient)
+	if result != Done {
+		return result
+	}
+
 	result = m.configureShares(ctx, instance, cteraClient)
 	if result != Done {
 		return result
@@ -354,6 +365,49 @@ func (m *KubeFilerManager) startCachingGateway(instance *kubefilerv1alpha1.KubeF
 	)
 
 	return Done
+}
+
+func (m *KubeFilerManager) configureNfsServer(cteraClient *cteraclient.CteraClient) Result {
+	conf, err := cteraClient.GetNfsConfiguration()
+	if err != nil {
+		return Result{err: err}
+	}
+
+	changed := m.alignNfsConfiguration(conf)
+	if !changed {
+		return Done
+	}
+
+	err = cteraClient.SetNfsConfiguration(conf)
+	if err != nil {
+		return Result{err: err}
+	}
+
+	return Requeue
+}
+
+func (m *KubeFilerManager) alignNfsConfiguration(conf *ctera.NfsConfiguration) bool {
+	changed := false
+
+	var mountdPort int32 = kubeFilerNfsMountdPort
+	if !conf.MountdPort.IsSet() || conf.MountdPort.Get() == nil || *conf.MountdPort.Get() != mountdPort {
+		conf.MountdPort.Set(&mountdPort)
+		changed = true
+	}
+
+	var statdPort int32 = kubeFilerNfsStatdPort
+	if !conf.StatdPort.IsSet() || conf.StatdPort.Get() == nil || *conf.StatdPort.Get() != statdPort {
+		conf.StatdPort.Set(&statdPort)
+		changed = true
+	}
+
+	nfsdHost := kubeFilerNfsNfsdHost
+	if !conf.NfsdHost.IsSet() || conf.NfsdHost.Get() == nil || *conf.NfsdHost.Get() != nfsdHost {
+		conf.NfsdHost.Set(&nfsdHost)
+		changed = true
+	}
+
+	return changed
 }
 
 func (m *KubeFilerManager) configureShares(ctx context.Context, instance *kubefilerv1alpha1.KubeFiler, cteraClient *cteraclient.CteraClient) Result {
