@@ -3,7 +3,7 @@ module github.com/ctera/kubefiler-operator
 go 1.16
 
 require (
-	github.com/ctera/ctera-gateway-openapi-go-client v0.2.1
+	github.com/ctera/ctera-gateway-openapi-go-client v0.3.0
 	github.com/go-logr/logr v0.4.0
 	github.com/google/uuid v1.1.2
 	github.com/jinzhu/copier v0.3.2
