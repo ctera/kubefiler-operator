@@ -42,7 +42,12 @@ func getOrCreateShare(cteraClient *cteraclient.CteraClient, instance *kubefilerv
 	if trustedNfsClients == nil {
 		trustedNfsClients = make([]ctera.NFSv3AccessControlEntry, 0)
 	}
-	trustedNfsClients = append(trustedNfsClients, *ctera.NewNFSv3AccessControlEntry("127.0.0.1", "255.255.255.255", ctera.RW))
+
+	accessControlEntry := ctera.NewNFSv3AccessControlEntry("127.0.0.1", "255.255.255.255", ctera.RW)
+	insecure := true
+	accessControlEntry.Insecure = &insecure
+
+	trustedNfsClients = append(trustedNfsClients, *accessControlEntry)
 
 	shareUuid := instance.Annotations[shareUuidAnnotation]
 	share, err = cteraClient.CreateShare(instance.GetName(), instance.Spec.Path, &shareUuid, trustedNfsClients)
