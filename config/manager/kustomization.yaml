@@ -1,5 +1,6 @@
 resources:
 - manager.yaml
+- locker.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

@@ -26,6 +26,8 @@ type OperatorConfig struct {
 	GatewayOpenAPIContainerName string `mapstructure:"gateway-openapi-container-name"`
 	// WorkingNamespace defines the namespace for the operator's internal resources
 	WorkingNamespace string `mapstructure:"working-namespace"`
+	// LockerConfigMapName defines the name of the ConfigMap used as the backend for the distributed locking
+	LockerConfigMapName string `mapstructure:"locker-configmap-name"`
 }
 
 // Validate the OperatorConfig returning an error if the config is not
@@ -54,7 +56,8 @@ func NewSource() *Source {
 	v.SetDefault("gateway-storage-path", "/var/vol/2")
 	v.SetDefault("gateway-openapi-container-image", "192.168.9.174:5000/gateway-openapi:last_build")
 	v.SetDefault("gateway-openapi-container-name", "gateway-openapi")
-	v.SetDefault("working-namespace", "")
+	v.SetDefault("working-namespace", "kubefiler-operator-system")
+	v.SetDefault("locker-configmap-name", "kubefiler-operator-locker")
 	return &Source{v: v}
 }
 

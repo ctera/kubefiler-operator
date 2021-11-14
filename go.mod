@@ -12,8 +12,8 @@ require (
 	github.com/sethvargo/go-password v0.2.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
+	github.com/werf/lockgate v0.0.0-20211004100849-f85d5325b201
 	google.golang.org/grpc v1.38.0
 	k8s.io/api v0.22.2
 	k8s.io/apimachinery v0.22.2

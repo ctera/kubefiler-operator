@@ -51,6 +51,16 @@ spec:
             type: object
           status:
             description: KubeFilerExportStatus defines the observed state of KubeFilerExport
+            properties:
+              attachments:
+                additionalProperties:
+                  additionalProperties:
+                    type: boolean
+                  description: VolumeIDMap defines the value of the Attachments map
+                  type: object
+                description: Attachments keeps a map between the nodes and the volumes
+                  IDs attached to each one
+                type: object
             type: object
         type: object
     served: true
