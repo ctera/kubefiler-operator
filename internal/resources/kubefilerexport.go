@@ -18,11 +18,18 @@ package resources
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/werf/lockgate"
+	"github.com/werf/lockgate/pkg/distributed_locker"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
@@ -34,6 +41,7 @@ import (
 const (
 	kubeFilerExportFinalizer = "kubefiler-operator.ctera.com/kubeFilerExportFinalizer"
 	shareUuidAnnotation      = "kubefiler-operator.ctera.com/shareUuid"
+	lockTimeoutSeconds       = 30
 )
 
 // KubeFilerExportManager is used to manage KubeFilerExport resources.
@@ -42,6 +50,7 @@ type KubeFilerExportManager struct {
 	recorder record.EventRecorder
 	logger   Logger
 	cfg      *conf.OperatorConfig
+	locker   *distributed_locker.DistributedLocker
 }
 
 // NewKubeFilerExportManager creates a KubeFilerExportManager.
@@ -51,6 +60,16 @@ func NewKubeFilerExportManager(client client.Client, recorder record.EventRecord
 		recorder: recorder,
 		logger:   logger,
 		cfg:      conf.Get(),
+		locker: distributed_locker.NewKubernetesLocker(
+			dynamic.NewForConfigOrDie(ctrl.GetConfigOrDie()),
+			schema.GroupVersionResource{
+				Group:    "",
+				Version:  "v1",
+				Resource: "configmaps",
+			},
+			conf.Get().LockerConfigMapName,
+			conf.Get().WorkingNamespace,
+		),
 	}
 }
 
@@ -70,6 +89,18 @@ func (m *KubeFilerExportManager) Process(ctx context.Context, nsname types.Names
 		return Result{err: err}
 	}
 
+	lockName := fmt.Sprintf("%s/%s", nsname.Namespace, nsname.Name)
+	acquired, lockHandle, err := m.locker.Acquire(lockName, lockgate.AcquireOptions{Timeout: time.Second * lockTimeoutSeconds})
+	if err != nil {
+		m.logger.Error(err, "Error while trying to acquire lock")
+		return Result{err: err}
+	}
+	if !acquired {
+		return Requeue
+	}
+	defer func() {
+		m.locker.Release(lockHandle)
+	}()
 	// now that we have the resource. determine if its alive or pending deletion
 	if instance.GetDeletionTimestamp() != nil {
 		// its being deleted

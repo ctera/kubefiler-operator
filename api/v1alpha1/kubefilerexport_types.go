@@ -40,10 +40,16 @@ type KubeFilerExportSpec struct {
 	ReadOnly bool `json:"readOnly,omitempty"`
 }
 
+// VolumeIDMap defines the value of the Attachments map
+type VolumeIDMap map[string]bool
+
 // KubeFilerExportStatus defines the observed state of KubeFilerExport
 type KubeFilerExportStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// Attachments keeps a map between the nodes and the volumes IDs attached to each one
+	Attachments map[string]VolumeIDMap `json:"attachments,omitempty"`
 }
 
 //+kubebuilder:object:root=true
