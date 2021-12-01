@@ -1,0 +1,3 @@
+build-container-image: kubefiler-operator-build
+volumes:
+  - ${HOME}/.kube:${HOME}/.kube
